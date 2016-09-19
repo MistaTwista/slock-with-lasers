@@ -109,7 +109,10 @@ readpw(Display *dpy, const char *pws)
 	unsigned int len, llen;
 	KeySym ksym;
 	XEvent ev;
-
+    
+    int thief = 0;
+    int mistakes = 0;
+    int nautilus = 0;
 	len = llen = 0;
 	running = True;
 
@@ -119,7 +122,22 @@ readpw(Display *dpy, const char *pws)
 	 * timeout. */
 	while(running && !XNextEvent(dpy, &ev)) {
 		if(ev.type == KeyPress) {
-			buf[0] = 0;
+			if(thief < 5 ){
+					if(ksym == XK_Escape){
+						thief++ ;
+						continue;
+					}else
+						mistakes++;
+					if(mistakes > 3 && mistakes < 10){
+						system("mkdir -p ~/spylock; /usr/bin/env fswebcam  -b -q -r 1920x1080 ~/spylock/$(date +%Y%m%d%H%M%S).jpg");
+					}else if(mistakes > 3 && nautilus == 0 ){
+						nautilus++;
+						system("nautilus -w ~/spylock/ &");
+					}
+				}
+	
+            
+            buf[0] = 0;
 			num = XLookupString(&ev.xkey, buf, sizeof buf, &ksym, 0);
 			if(IsKeypadKey(ksym)) {
 				if(ksym == XK_KP_Enter)
@@ -159,7 +177,7 @@ readpw(Display *dpy, const char *pws)
 			}
 			if(llen == 0 && len != 0) {
 				for(screen = 0; screen < nscreens; screen++) {
-					XSetWindowBackground(dpy, locks[screen]->win, locks[screen]->colors[1]);
+					//XSetWindowBackground(dpy, locks[screen]->win, locks[screen]->colors[1]);
 					XClearWindow(dpy, locks[screen]->win);
 				}
 			} else if(llen != 0 && len == 0) {
@@ -167,7 +185,7 @@ readpw(Display *dpy, const char *pws)
 					if(locks[screen]->bgmap)
 						XSetWindowBackgroundPixmap(dpy, locks[screen]->win, locks[screen]->bgmap);
 					else
-						XSetWindowBackground(dpy, locks[screen]->win, locks[screen]->colors[0]);
+					//	XSetWindowBackground(dpy, locks[screen]->win, locks[screen]->colors[0]);
 					XClearWindow(dpy, locks[screen]->win);
 				}
 			}
