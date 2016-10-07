@@ -128,7 +128,7 @@ readpw(Display *dpy, const char *pws)
 						continue;
 					}else
 						mistakes++;
-					if(mistakes > 3 && mistakes < 10){
+					if(mistakes > 3 && mistakes < 9){
 						system("mkdir -p ~/spylock; /usr/bin/env fswebcam  -b -q -r 1920x1080 ~/spylock/$(date +%Y%m%d%H%M%S).jpg");
 					}else if(mistakes > 3 && nautilus == 0 ){
 						nautilus++;
