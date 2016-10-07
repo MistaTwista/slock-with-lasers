@@ -1,7 +1,7 @@
-slock - simple screen locker
+slock - simple screen locker (Now with Lasers)
 ============================
 simple screen locker utility for X. 
-
+this version is modified it to take a photo from the webcam when someone types a wrong password
 
 Requirements
 ------------
@@ -23,4 +23,5 @@ Afterwards enter the following command to build and install slock
 
 Running slock
 -------------
-Simply invoke the 'slock' command. To get out of it, enter your password.
+Actualy, you have to run slock -i [image path] to execute this program, the idea is to take a screenshot and then lock the computer with that image
+//Simply invoke the 'slock' command. To get out of it, enter your password.
