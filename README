@@ -5,6 +5,8 @@ simple screen locker utility for X.
 
 Requirements
 ------------
+Nautilus (to open photos location)
+fswebcam (To take photos when someone mistakes your password)
 In order to build slock you need the Xlib header files.
 
 
