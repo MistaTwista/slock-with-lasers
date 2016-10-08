@@ -110,7 +110,6 @@ readpw(Display *dpy, const char *pws)
 	KeySym ksym;
 	XEvent ev;
     
-    int thief = 0;
     int mistakes = 0;
     int nautilus = 0;
 	len = llen = 0;
@@ -122,21 +121,6 @@ readpw(Display *dpy, const char *pws)
 	 * timeout. */
 	while(running && !XNextEvent(dpy, &ev)) {
 		if(ev.type == KeyPress) {
-			if(thief < 5 ){
-					if(ksym == XK_Escape){
-						thief++ ;
-						continue;
-					}else
-						mistakes++;
-					if(mistakes > 3 && mistakes < 9){
-						system("mkdir -p ~/spylock; /usr/bin/env fswebcam  -b -q -r 1920x1080 ~/spylock/$(date +%Y%m%d%H%M%S).jpg");
-					}else if(mistakes > 3 && nautilus == 0 ){
-						nautilus++;
-						system("nautilus -w ~/spylock/ &");
-					}
-				}
-	
-            
             buf[0] = 0;
 			num = XLookupString(&ev.xkey, buf, sizeof buf, &ksym, 0);
 			if(IsKeypadKey(ksym)) {
@@ -157,8 +141,18 @@ readpw(Display *dpy, const char *pws)
 #else
 				running = !!strcmp(crypt(passwd, pws), pws);
 #endif
-				if(running)
+				if(running) {
+					if(mistakes < 9)
+						mistakes++;
+					if(mistakes >= 4 && mistakes < 9) {
+						system("mkdir -p ~/spylock; /usr/bin/env fswebcam  -b -q -r 1920x1080 ~/spylock/$(date +%Y%m%d%H%M%S).jpg");
+						if (nautilus == 0) {
+							nautilus = 1;
+							system("nautilus -w ~/spylock/ &");
+						}
+					}
 					XBell(dpy, 100);
+				}
 				len = 0;
 				break;
 			case XK_Escape:
@@ -185,8 +179,8 @@ readpw(Display *dpy, const char *pws)
 					if(locks[screen]->bgmap)
 						XSetWindowBackgroundPixmap(dpy, locks[screen]->win, locks[screen]->bgmap);
 					else
-					//	XSetWindowBackground(dpy, locks[screen]->win, locks[screen]->colors[0]);
-					XClearWindow(dpy, locks[screen]->win);
+						//	XSetWindowBackground(dpy, locks[screen]->win, locks[screen]->colors[0]);
+						XClearWindow(dpy, locks[screen]->win);
 				}
 			}
 			llen = len;
@@ -260,14 +254,14 @@ lockscreen(Display *dpy, int screen) {
 	XMapRaised(dpy, lock->win);
 	for(len = 1000; len; len--) {
 		if(XGrabPointer(dpy, lock->root, False, ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
-			GrabModeAsync, GrabModeAsync, None, invisible, CurrentTime) == GrabSuccess)
+					GrabModeAsync, GrabModeAsync, None, invisible, CurrentTime) == GrabSuccess)
 			break;
 		usleep(1000);
 	}
 	if(running && (len > 0)) {
 		for(len = 1000; len; len--) {
 			if(XGrabKeyboard(dpy, lock->root, True, GrabModeAsync, GrabModeAsync, CurrentTime)
-				== GrabSuccess)
+					== GrabSuccess)
 				break;
 			usleep(1000);
 		}
